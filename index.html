@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HOPE FUTSAL LEAGUE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --rojo: #a5001a;
+            --rojo-claro: #c7002b;
+            --rojo-oscuro: #7a0012;
+            --azul: #004d98;
+            --azul-oscuro: #003070;
+            --azul-claro: #1a6bc4;
+            --amarillo: #ffd700;
+            --blanco: #ffffff;
+            --negro: #0a0a0a;
+            --gris-oscuro: #1a1a1a;
+            --gris-medio: #2a2a2a;
+            --gris-claro: #3a3a3a;
+            --font: 'Inter', sans-serif;
+            --gradient-main: linear-gradient(135deg, #0a0a0a 0%, #1a0505 30%, #0a1a2a 60%, #0a0a0a 100%);
+            --gradient-card: linear-gradient(145deg, #1a1a1a, #0d1a2d);
+            --gradient-gold: linear-gradient(135deg, #ffd700, #ff8c00);
+            --gradient-red: linear-gradient(135deg, #a5001a, #c7002b);
+            --gradient-blue: linear-gradient(135deg, #004d98, #1a6bc4);
+            --shadow-glow: 0 0 40px rgba(165, 0, 26, 0.15);
+            --texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        body {
+            font-family: var(--font);
+            background: var(--gradient-main);
+            color: var(--blanco);
+            min-height: 100vh;
+            padding-top: 112px;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--texture);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--gris-oscuro); }
+        ::-webkit-scrollbar-thumb { background: var(--rojo); border-radius: 3px; }
+
+        /* ========== HEADER FIJO ========== */
+        .header-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10,10,10,0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(255,215,0,0.1);
+        }
+
+        .top-header {
+            padding: 0 30px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ===== ANIMACIÓN DE TEXTO HOPE FUTSAL ===== */
+        .logo-text {
+            font-weight: 900;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 25%, #ffd700 50%, #ff8c00 75%, #ffd700 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+            position: relative;
+        }
+        .logo-text::after {
+            content: 'HOPE FUTSAL';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #ffd700 0%, #ff8c00 25%, #ffd700 50%, #ff8c00 75%, #ffd700 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite reverse;
+            opacity: 0.3;
+            filter: blur(8px);
+            z-index: -1;
+            transform: scale(1.02);
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .logo-text span {
+            -webkit-text-fill-color: var(--rojo);
+            animation: none;
+            background: none;
+            color: var(--rojo);
+        }
+
+        .top-header .header-right { display: flex; gap: 12px; align-items: center; }
+        .top-header .login-btn-header {
+            background: var(--gradient-red);
+            border: none;
+            color: white;
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .top-header .login-btn-header:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(165, 0, 26, 0.4);
+        }
+        .top-header .login-btn-header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(45deg) translateX(-100%);
+            transition: 0.8s;
+        }
+        .top-header .login-btn-header:hover::after {
+            transform: rotate(45deg) translateX(100%);
+        }
+        .top-header .plan-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #aaa;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: 0.3s;
+        }
+        .top-header .plan-btn:hover {
+            border-color: var(--amarillo);
+            color: var(--amarillo);
+            transform: translateY(-2px);
+        }
+
+        /* ========== NAV FIJO ========== */
+        .nav-bar {
+            background: rgba(26,26,26,0.92);
+            backdrop-filter: blur(12px);
+            padding: 0 30px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .nav-bar a {
+            color: #999;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        .nav-bar a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-gold);
+            transition: 0.3s;
+        }
+        .nav-bar a:hover::after, .nav-bar a.active::after {
+            width: 100%;
+        }
+        .nav-bar a:hover { color: var(--blanco); }
+        .nav-bar a.active { color: var(--blanco); }
+
+        /* ========== LOGIN FLUIDO PROFESIONAL ========== */
+        #loginOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(15px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #loginOverlay.active { display: flex; }
+        .login-modal {
+            background: linear-gradient(145deg, #1a1a2e, #0d0d1a);
+            border-radius: 24px;
+            padding: 50px 45px 40px;
+            max-width: 440px;
+            width: 100%;
+            border: 1px solid rgba(255,215,0,0.15);
+            position: relative;
+            animation: modalIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+        .login-modal::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(165,0,26,0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.9) translateY(30px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .login-modal .close-login {
+            position: absolute;
+            top: 16px; right: 20px;
+            background: none; border: none;
+            color: #666; font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 2;
+        }
+        .login-modal .close-login:hover { color: var(--blanco); transform: rotate(90deg); }
+        .login-modal .login-brand { text-align: center; margin-bottom: 32px; position: relative; z-index: 1; }
+        .login-modal .login-brand .logo-icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            display: block;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-modal .login-brand h2 {
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .login-modal .login-brand p {
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+        .login-modal label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--amarillo);
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-modal input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            font-family: var(--font);
+            transition: 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        .login-modal input:focus {
+            border-color: var(--amarillo);
+            outline: none;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
+            background: rgba(0,0,0,0.6);
+        }
+        .login-modal .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-red);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .login-modal .login-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(165, 0, 26, 0.4);
+        }
+        .login-modal .login-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg) translateX(-100%);
+            transition: 0.8s;
+        }
+        .login-modal .login-btn:hover::after {
+            transform: rotate(45deg) translateX(100%);
+        }
+        .login-modal .login-divider {
+            display: flex; align-items: center;
+            gap: 16px; margin: 20px 0;
+            color: #555; font-size: 0.8rem;
+            position: relative;
+            z-index: 1;
+        }
+        .login-modal .login-divider hr { flex: 1; border: none; border-top: 1px solid rgba(255,255,255,0.06); }
+        .login-modal .social-login {
+            display: flex; gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-modal .social-login button {
+            flex: 1; padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: var(--font);
+            display: flex; align-items: center;
+            justify-content: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .login-modal .social-login button:hover {
+            border-color: var(--amarillo);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.05);
+            background: rgba(0,0,0,0.5);
+        }
+        .login-modal .login-footer {
+            text-align: center; margin-top: 20px;
+            font-size: 0.8rem; color: #666;
+            position: relative;
+            z-index: 1;
+        }
+        .login-modal .login-footer a {
+            color: var(--amarillo);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-modal .login-footer a:hover { text-decoration: underline; }
+
+        /* ========== SLIDER 1920x1080 ========== */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1920px;
+            margin: 0 auto;
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            background: var(--negro);
+            border-radius: 0;
+        }
+        .slider-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            height: 100%;
+        }
+        .slider-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .slider-slide video, .slider-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .slider-slide .overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            padding: 30px 40px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.85));
+        }
+        .slider-slide .overlay h2 {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .slider-slide .overlay p { color: #aaa; font-weight: 300; }
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid rgba(255,215,0,0.15);
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+            border-radius: 50%;
+            transition: 0.3s;
+            backdrop-filter: blur(4px);
+        }
+        .slider-btn:hover {
+            background: var(--gradient-red);
+            border-color: var(--amarillo);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .slider-btn.prev { left: 16px; }
+        .slider-btn.next { right: 16px; }
+        .slider-dots {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .slider-dot.active {
+            background: var(--amarillo);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        /* ========== SECCIONES ========== */
+        .section {
+            padding: 40px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            scroll-margin-top: 120px;
+        }
+        .section-title {
+            font-weight: 800;
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        /* TABLA */
+        .table-container {
+            background: var(--gradient-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,215,0,0.08);
+            overflow-x: auto;
+            transition: 0.3s;
+            box-shadow: var(--shadow-glow);
+        }
+        .table-container:hover {
+            border-color: rgba(255,215,0,0.2);
+            box-shadow: 0 0 50px rgba(165, 0, 26, 0.1);
+        }
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-container th {
+            text-align: left;
+            padding: 12px 10px;
+            color: var(--amarillo);
+            border-bottom: 2px solid var(--amarillo);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .table-container td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.9rem;
+        }
+        .table-container tr {
+            transition: 0.3s;
+            cursor: default;
+        }
+        .table-container tr:hover {
+            background: rgba(165, 0, 26, 0.08);
+            transform: scale(1.01);
+        }
+        .team-logo-mini {
+            width: 28px; height: 28px;
+            object-fit: contain;
+            border-radius: 4px;
+            margin-right: 10px;
+            vertical-align: middle;
+            transition: 0.3s;
+        }
+        .team-logo-mini:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+        .pos-1 { color: var(--amarillo); font-weight: 700; }
+        .pos-2 { color: #c0c0c0; font-weight: 700; }
+        .pos-3 { color: #cd7f32; font-weight: 700; }
+
+        /* ========== MVP Y GOLEADORES ========== */
+        .mvp-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 10px;
+        }
+        @media (max-width: 1024px) {
+            .mvp-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        .mvp-card-large {
+            background: var(--gradient-card);
+            border-radius: 20px;
+            padding: 0;
+            border: 1px solid rgba(255,215,0,0.08);
+            overflow: hidden;
+            transition: 0.4s;
+            box-shadow: var(--shadow-glow);
+            position: relative;
+        }
+        .mvp-card-large:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255,215,0,0.3);
+            box-shadow: 0 0 60px rgba(165, 0, 26, 0.15);
+        }
+        .mvp-card-large .mvp-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            transition: 0.6s;
+            background: var(--gris-oscuro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: #555;
+        }
+        .mvp-card-large:hover .mvp-image {
+            transform: scale(1.03);
+        }
+        .mvp-card-large .mvp-info {
+            padding: 20px 24px 24px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+        }
+        .mvp-card-large .mvp-info .mvp-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--amarillo);
+            font-weight: 700;
+        }
+        .mvp-card-large .mvp-info h3 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-top: 4px;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .mvp-card-large .mvp-info p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        /* TOP SCORERS - 3 Goleadores sin medallas */
+        .top-scorers-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .top-scorers-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .top-scorers-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scorer-card {
+            background: var(--gradient-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.08);
+            transition: 0.4s;
+            box-shadow: var(--shadow-glow);
+            text-align: center;
+        }
+        .scorer-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255,215,0,0.25);
+            box-shadow: 0 0 40px rgba(165, 0, 26, 0.1);
+        }
+        .scorer-card .scorer-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            transition: 0.6s;
+            background: var(--gris-oscuro);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #555;
+        }
+        .scorer-card:hover .scorer-image {
+            transform: scale(1.04);
+        }
+        .scorer-card .scorer-info {
+            padding: 16px 18px 20px;
+        }
+        .scorer-card .scorer-info .scorer-position {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--amarillo);
+            font-weight: 700;
+        }
+        .scorer-card .scorer-info h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-top: 2px;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .scorer-card .scorer-info .scorer-goals {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--amarillo);
+            margin-top: 4px;
+        }
+        .scorer-card .scorer-info .scorer-goals span {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #888;
+        }
+
+        .scorer-card.pos-1 { border-color: var(--amarillo); }
+        .scorer-card.pos-1 .scorer-info .scorer-position { color: var(--amarillo); }
+        .scorer-card.pos-2 { border-color: #c0c0c0; }
+        .scorer-card.pos-2 .scorer-info .scorer-position { color: #c0c0c0; }
+        .scorer-card.pos-3 { border-color: #cd7f32; }
+        .scorer-card.pos-3 .scorer-info .scorer-position { color: #cd7f32; }
+
+        /* ========== PATROCINADORES CON BOTONES ========== */
+        .sponsors-loop {
+            background: var(--gradient-card);
+            padding: 24px 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(255,215,0,0.08);
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+            margin: 24px 0;
+        }
+        .sponsors-track {
+            display: flex;
+            animation: scrollSponsors 30s linear infinite;
+            gap: 40px;
+            align-items: center;
+        }
+        .sponsor-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.4s;
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .sponsor-link:hover {
+            transform: scale(1.1);
+            background: rgba(255,215,0,0.05);
+            border-color: var(--amarillo);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.05);
+        }
+        .sponsor-link img {
+            height: 45px;
+            object-fit: contain;
+            filter: grayscale(100%) brightness(1.5);
+            transition: 0.4s;
+        }
+        .sponsor-link:hover img {
+            filter: grayscale(0%) brightness(1);
+        }
+        @keyframes scrollSponsors {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* JORNADAS */
+        .jornada-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--gradient-card);
+            border-radius: 16px;
+            border: 1px solid rgba(255,215,0,0.08);
+            transition: 0.4s;
+        }
+        .jornada-section:hover {
+            border-color: rgba(255,215,0,0.2);
+            box-shadow: var(--shadow-glow);
+        }
+        .jornada-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,215,0,0.08);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .jornada-header h4 {
+            font-size: 1.1rem;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .jornada-header .jornada-fecha {
+            color: #888;
+            font-size: 0.85rem;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .match-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            border-left: 3px solid var(--amarillo);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .match-card:hover {
+            transform: translateX(8px);
+            background: rgba(165, 0, 26, 0.08);
+            border-left-color: var(--rojo);
+        }
+        .match-card .teams {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        .match-card .teams img {
+            width: 28px; height: 28px;
+            object-fit: contain;
+            transition: 0.3s;
+        }
+        .match-card .teams img:hover {
+            transform: scale(1.2) rotate(5deg);
+        }
+        .match-card .result {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--amarillo);
+        }
+        .match-card .match-hora {
+            font-size: 0.75rem;
+            color: #666;
+            width: 100%;
+        }
+
+        /* SECCIONES INFORMATIVAS */
+        .info-sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 20px;
+        }
+        .info-card {
+            background: var(--gradient-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.08);
+            transition: 0.4s;
+            box-shadow: var(--shadow-glow);
+        }
+        .info-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255,215,0,0.3);
+            box-shadow: 0 0 60px rgba(165, 0, 26, 0.1);
+        }
+        .info-card .info-image {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            transition: 0.6s;
+        }
+        .info-card:hover .info-image {
+            transform: scale(1.05);
+        }
+        .info-card .info-content {
+            padding: 20px;
+        }
+        .info-card .info-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .info-card .info-content p {
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* VIDEO FINAL 1920x1080 */
+        .final-video {
+            background: var(--gradient-card);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.08);
+            margin-top: 24px;
+            transition: 0.4s;
+        }
+        .final-video:hover {
+            border-color: rgba(255,215,0,0.2);
+            box-shadow: var(--shadow-glow);
+        }
+        .final-video video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+        }
+        .final-video .info {
+            padding: 24px 30px;
+            background: rgba(0,0,0,0.5);
+        }
+        .final-video .info h3 {
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .final-video .info p { color: #aaa; }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 28px;
+            color: #555;
+            border-top: 1px solid rgba(255,215,0,0.08);
+            font-size: 0.8rem;
+        }
+        .footer span { color: var(--amarillo); }
+
+        /* ========== ADMIN PANEL ========== */
+        #adminPanel {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(12px);
+            z-index: 10000;
+            overflow-y: auto;
+            padding: 24px 20px;
+        }
+        #adminPanel.active { display: block; }
+        .admin-container { max-width: 1400px; margin: 0 auto; }
+        .admin-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--gradient-card);
+            border-radius: 16px;
+            border: 1px solid var(--amarillo);
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .admin-header-bar h2 {
+            font-weight: 800;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.4rem;
+        }
+        .admin-header-bar h2 i { -webkit-text-fill-color: var(--rojo); }
+        .admin-close-btn {
+            background: var(--gradient-red);
+            border: none;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: 0.3s;
+        }
+        .admin-close-btn:hover { transform: scale(1.05); box-shadow: 0 0 40px rgba(165,0,26,0.4); }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .admin-card {
+            background: var(--gradient-card);
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid rgba(255,215,0,0.08);
+            transition: 0.3s;
+        }
+        .admin-card:hover {
+            border-color: rgba(255,215,0,0.2);
+            box-shadow: var(--shadow-glow);
+        }
+        .admin-card h3 {
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .admin-card h3 i { -webkit-text-fill-color: var(--rojo); }
+        .admin-input {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            color: white;
+            font-family: var(--font);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        .admin-input:focus { border-color: var(--amarillo); outline: none; box-shadow: 0 0 20px rgba(255,215,0,0.05); }
+        .admin-btn {
+            background: var(--gradient-red);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: 0.3s;
+            margin-right: 4px;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+        }
+        .admin-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(165,0,26,0.3); }
+        .admin-btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+        .admin-btn-danger { background: #660000; }
+        .admin-btn-danger:hover { background: var(--gradient-red); }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .admin-table th {
+            text-align: left;
+            padding: 8px 6px;
+            color: var(--amarillo);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-weight: 600;
+        }
+        .admin-table td {
+            padding: 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .admin-table input, .admin-table select {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            width: 100%;
+            font-family: var(--font);
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+        .admin-table input:focus { border-color: var(--amarillo); outline: none; }
+
+        .file-input-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .file-input-wrapper input[type="file"] { display: none; }
+        .file-input-wrapper .file-label {
+            background: rgba(255,255,255,0.06);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: 0.3s;
+        }
+        .file-input-wrapper .file-label:hover {
+            border-color: var(--amarillo);
+            transform: translateY(-2px);
+        }
+        .file-input-wrapper .file-preview {
+            max-width: 60px;
+            max-height: 60px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 98px; }
+            .top-header { padding: 0 16px; height: 56px; }
+            .top-header .logo-text { font-size: 1.1rem; }
+            .nav-bar { padding: 0 16px; gap: 14px; height: 38px; }
+            .nav-bar a { font-size: 0.5rem; letter-spacing: 0.5px; }
+            .section { padding: 24px 16px; }
+            .section-title { font-size: 1.3rem; }
+            .login-modal { padding: 35px 24px; }
+            .admin-grid { grid-template-columns: 1fr; }
+            .top-header .plan-btn { display: none; }
+            .top-header .login-btn-header { padding: 8px 18px; font-size: 0.75rem; }
+            .info-sections-grid { grid-template-columns: 1fr; }
+            .mvp-container { grid-template-columns: 1fr; }
+            .top-scorers-container { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .slider-container { aspect-ratio: 16/9; }
+            .slider-slide .overlay h2 { font-size: 1.2rem; }
+            .slider-btn { padding: 8px 12px; font-size: 0.9rem; }
+            .top-scorers-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== HEADER FIJO ========== -->
+<div class="header-fixed">
+    <header class="top-header">
+        <div class="logo-text">HOPE <span>FUTSAL</span></div>
+        <div class="header-right">
+            <button class="plan-btn">Ver Planes</button>
+            <button class="login-btn-header" onclick="openLogin()">Login</button>
+        </div>
+    </header>
+
+    <nav class="nav-bar">
+        <a href="#inicio" class="active" onclick="scrollToSection('inicio')">Inicio</a>
+        <a href="#posiciones" onclick="scrollToSection('posiciones')">Posiciones</a>
+        <a href="#mvp" onclick="scrollToSection('mvp')">MVP</a>
+        <a href="#jornadas" onclick="scrollToSection('jornadas')">Jornadas</a>
+        <a href="#resultados" onclick="scrollToSection('resultados')">Resultados</a>
+        <a href="#info" onclick="scrollToSection('info')">Info</a>
+        <a href="#patrocinadores" onclick="scrollToSection('patrocinadores')">Patrocinadores</a>
+        <a href="#final" onclick="scrollToSection('final')">Final</a>
+    </nav>
+</div>
+
+<!-- ========== LOGIN MODAL FLUIDO ========== -->
+<div id="loginOverlay">
+    <div class="login-modal">
+        <button class="close-login" onclick="closeLogin()"><i class="fas fa-times"></i></button>
+        <div class="login-brand">
+            <span class="logo-icon"><i class="fas fa-futbol"></i></span>
+            <h2>HOPE <span style="-webkit-text-fill-color:var(--rojo);">FUTSAL</span></h2>
+            <p>Inicia sesión con tu cuenta</p>
+        </div>
+        <div>
+            <label>Correo electrónico *</label>
+            <input type="text" id="loginEmail" value="admin@hope.com" />
+            <label>Contraseña *</label>
+            <input type="password" id="loginPassword" value="hope2026" />
+        </div>
+        <button class="login-btn" onclick="handleLogin()">CONTINUAR</button>
+        <div class="login-divider"><hr /> o <hr /></div>
+        <div class="social-login">
+            <button><i class="fab fa-google"></i> Google</button>
+            <button><i class="fab fa-apple"></i> Apple</button>
+        </div>
+        <div class="login-footer">
+            <a href="#" onclick="alert('Contacta con el administrador')">Iniciar sesión como socio</a>
+        </div>
+    </div>
+</div>
+
+<div class="content-wrapper">
+    <!-- ========== SLIDER 1920x1080 ========== -->
+    <div class="slider-container" id="inicio">
+        <button class="slider-btn prev" onclick="changeSlide(-1)">❮</button>
+        <button class="slider-btn next" onclick="changeSlide(1)">❯</button>
+        <div class="slider-track" id="sliderTrack"></div>
+        <div class="slider-dots" id="sliderDots"></div>
+    </div>
+
+    <!-- ========== TABLA POSICIONES ========== -->
+    <section class="section" id="posiciones">
+        <div class="section-title">Tabla de Posiciones</div>
+        <div class="table-container">
+            <table>
+                <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>PTS</th></tr></thead>
+                <tbody id="positionsBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ========== MVP Y GOLEADORES ========== -->
+    <section class="section" id="mvp">
+        <div class="section-title">MVP y Goleadores</div>
+        <div class="mvp-container">
+            <!-- MVP -->
+            <div class="mvp-card-large" id="mvpCard">
+                <div class="mvp-image" id="mvpImage">
+                    <i class="fas fa-user"></i>
+                    <img id="mvpImageImg" style="display:none;width:100%;height:100%;object-fit:cover;" />
+                </div>
+                <div class="mvp-info">
+                    <div class="mvp-label">⭐ MVP de la Semana</div>
+                    <h3 id="mvpNameDisplay">Jugador MVP</h3>
+                    <p>Mejor jugador de la jornada</p>
+                </div>
+            </div>
+
+            <!-- TOP 3 GOLEADORES -->
+            <div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                    <span style="font-size:1.5rem;">⚽</span>
+                    <span style="font-weight:700; font-size:1.1rem; background:var(--gradient-gold); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Máximos Goleadores</span>
+                </div>
+                <div class="top-scorers-container" id="topScorersContainer">
+                    <!-- Se renderiza dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== JORNADAS ========== -->
+    <section class="section" id="jornadas">
+        <div class="section-title">Jornadas</div>
+        <div id="jornadasContainer"></div>
+    </section>
+
+    <!-- ========== RESULTADOS ========== -->
+    <section class="section" id="resultados">
+        <div class="section-title">Resultados</div>
+        <div class="calendar-grid" id="resultsGrid"></div>
+    </section>
+
+    <!-- ========== SECCIONES INFORMATIVAS ========== -->
+    <section class="section" id="info">
+        <div class="section-title">Información General</div>
+        <div class="info-sections-grid" id="infoSectionsGrid"></div>
+    </section>
+
+    <!-- ========== PATROCINADORES CON BOTONES ========== -->
+    <div class="sponsors-loop" id="patrocinadores">
+        <div class="section-title" style="padding:0 30px; font-size:1.2rem; margin-bottom:16px;">
+            Patrocinadores
+        </div>
+        <div class="sponsors-track" id="sponsorsTrack"></div>
+    </div>
+
+    <!-- ========== VIDEO FINAL 1920x1080 ========== -->
+    <section class="section" id="final">
+        <div class="final-video">
+            <video id="finalVideo" controls><source src="" type="video/mp4" /></video>
+            <div class="info">
+                <h3>Información de la Final</h3>
+                <p id="finalInfoText">La gran final se jugará el próximo sábado en el Hope Arena.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2026 HOPE FUTSAL LEAGUE · <span>⚡</span> Powered by Hope</p>
+    </footer>
+</div>
+
+<!-- ========== ADMIN PANEL ========== -->
+<div id="adminPanel">
+    <div class="admin-container">
+        <div class="admin-header-bar">
+            <h2>SUPER ADMIN · HOPE FUTSAL</h2>
+            <div>
+                <button class="admin-btn" onclick="saveAllData()">Guardar</button>
+                <button class="admin-close-btn" onclick="toggleAdmin()">Cerrar</button>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <!-- Configuración -->
+            <div class="admin-card">
+                <h3>Configuración</h3>
+                <label style="color:#888;font-size:0.7rem;">Nombre Liga</label>
+                <input class="admin-input" id="leagueNameInput" value="HOPE FUTSAL LEAGUE" />
+                <label style="color:#888;font-size:0.7rem;">Logo Liga</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="leagueLogoFile" accept="image/*" onchange="handleFileUpload(this, 'leagueLogoImg')" />
+                    <label class="file-label" for="leagueLogoFile">Subir logo</label>
+                    <img id="leagueLogoImg" class="file-preview" src="https://via.placeholder.com/60/cc0000/ffffff?text=H" />
+                </div>
+                <button class="admin-btn" onclick="updateLeagueConfig()">Actualizar</button>
+            </div>
+
+            <!-- Equipos -->
+            <div class="admin-card">
+                <h3>Equipos</h3>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                    <input class="admin-input" id="newTeamName" placeholder="Nombre" style="flex:1;min-width:100px;" />
+                    <input class="admin-input" id="newTeamLogo" placeholder="Logo URL" style="flex:1;min-width:100px;" />
+                    <button class="admin-btn" onclick="addTeam()"><i class="fas fa-plus"></i></button>
+                </div>
+                <div style="display:flex; gap:6px; margin-bottom:12px;">
+                    <input type="file" id="teamLogoFile" accept="image/*" style="display:none;" onchange="handleTeamLogoUpload(this)" />
+                    <label class="file-label" for="teamLogoFile" style="font-size:0.75rem;padding:6px 14px;">Subir logo equipo</label>
+                </div>
+                <div style="max-height:280px; overflow-y:auto;">
+                    <table class="admin-table" id="adminTeamsTable">
+                        <thead><tr><th>Logo</th><th>Nombre</th><th>Acciones</th></tr></thead>
+                        <tbody id="adminTeamsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Jornadas -->
+            <div class="admin-card">
+                <h3>Jornadas</h3>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                    <input class="admin-input" id="newJornadaNombre" placeholder="Nombre Jornada" style="flex:1;min-width:100px;" />
+                    <input class="admin-input" id="newJornadaFecha" type="datetime-local" style="flex:1;min-width:100px;" />
+                    <button class="admin-btn" onclick="addJornada()"><i class="fas fa-plus"></i></button>
+                </div>
+                <div style="max-height:280px; overflow-y:auto;">
+                    <table class="admin-table" id="adminJornadasTable">
+                        <thead><tr><th>Nombre</th><th>Fecha/Hora</th><th>Acciones</th></tr></thead>
+                        <tbody id="adminJornadasBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Partidos -->
+            <div class="admin-card">
+                <h3>Partidos</h3>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                    <select id="matchJornada" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px;flex:1;"></select>
+                    <select id="matchLocal" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px;flex:1;"></select>
+                    <select id="matchVisit" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:8px;flex:1;"></select>
+                    <button class="admin-btn" onclick="addMatch()"><i class="fas fa-plus"></i></button>
+                </div>
+                <div style="max-height:280px; overflow-y:auto;">
+                    <table class="admin-table" id="adminMatchesTable">
+                        <thead><tr><th>Jornada</th><th>Local</th><th>Visitante</th><th>Resultado</th><th>Acciones</th></tr></thead>
+                        <tbody id="adminMatchesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MVP & Goleadores -->
+            <div class="admin-card">
+                <h3>MVP & Goleadores</h3>
+                <label style="color:#888;font-size:0.7rem;">MVP Nombre</label>
+                <input class="admin-input" id="mvpNameInput" />
+                <label style="color:#888;font-size:0.7rem;">MVP Foto</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="mvpPhotoFile" accept="image/*" onchange="handleMVPhotoUpload(this)" />
+                    <label class="file-label" for="mvpPhotoFile">Subir foto</label>
+                    <img id="mvpPhotoPreview" class="file-preview" />
+                </div>
+                <hr style="border-color:rgba(255,255,255,0.06); margin:12px 0;" />
+                <label style="color:#888;font-size:0.7rem;">Goleador #1 - Nombre</label>
+                <input class="admin-input" id="scorer1Name" placeholder="Nombre" />
+                <label style="color:#888;font-size:0.7rem;">Goles</label>
+                <input class="admin-input" id="scorer1Goals" placeholder="Cantidad" type="number" />
+                <label style="color:#888;font-size:0.7rem;">Foto Goleador #1</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="scorer1Photo" accept="image/*" onchange="handleScorerPhotoUpload(this, 'scorer1PhotoPreview')" />
+                    <label class="file-label" for="scorer1Photo">Subir foto</label>
+                    <img id="scorer1PhotoPreview" class="file-preview" />
+                </div>
+                <hr style="border-color:rgba(255,255,255,0.06); margin:12px 0;" />
+                <label style="color:#888;font-size:0.7rem;">Goleador #2 - Nombre</label>
+                <input class="admin-input" id="scorer2Name" placeholder="Nombre" />
+                <label style="color:#888;font-size:0.7rem;">Goles</label>
+                <input class="admin-input" id="scorer2Goals" placeholder="Cantidad" type="number" />
+                <label style="color:#888;font-size:0.7rem;">Foto Goleador #2</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="scorer2Photo" accept="image/*" onchange="handleScorerPhotoUpload(this, 'scorer2PhotoPreview')" />
+                    <label class="file-label" for="scorer2Photo">Subir foto</label>
+                    <img id="scorer2PhotoPreview" class="file-preview" />
+                </div>
+                <hr style="border-color:rgba(255,255,255,0.06); margin:12px 0;" />
+                <label style="color:#888;font-size:0.7rem;">Goleador #3 - Nombre</label>
+                <input class="admin-input" id="scorer3Name" placeholder="Nombre" />
+                <label style="color:#888;font-size:0.7rem;">Goles</label>
+                <input class="admin-input" id="scorer3Goals" placeholder="Cantidad" type="number" />
+                <label style="color:#888;font-size:0.7rem;">Foto Goleador #3</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="scorer3Photo" accept="image/*" onchange="handleScorerPhotoUpload(this, 'scorer3PhotoPreview')" />
+                    <label class="file-label" for="scorer3Photo">Subir foto</label>
+                    <img id="scorer3PhotoPreview" class="file-preview" />
+                </div>
+                <button class="admin-btn" onclick="updateMVPAndScorers()" style="margin-top:10px;">Actualizar</button>
+            </div>
+
+            <!-- Patrocinadores con enlaces -->
+            <div class="admin-card">
+                <h3>Patrocinadores</h3>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                    <input class="admin-input" id="sponsorInput" placeholder="URL logo" style="flex:2;" />
+                    <input class="admin-input" id="sponsorLinkInput" placeholder="URL enlace (red social)" style="flex:2;" />
+                    <button class="admin-btn" onclick="addSponsor()"><i class="fas fa-plus"></i></button>
+                </div>
+                <div style="display:flex; gap:6px; margin-bottom:10px;">
+                    <input type="file" id="sponsorFile" accept="image/*" style="display:none;" onchange="handleSponsorUpload(this)" />
+                    <label class="file-label" for="sponsorFile" style="font-size:0.75rem;padding:6px 14px;">Subir patrocinador</label>
+                </div>
+                <div id="sponsorList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+            </div>
+
+            <!-- Videos Slider 1920x1080 -->
+            <div class="admin-card">
+                <h3>Videos Slider (16:9)</h3>
+                <div id="videoInputs">
+                    <input class="admin-input" id="video1" placeholder="Video 1 URL" />
+                    <input class="admin-input" id="video2" placeholder="Video 2 URL" />
+                    <input class="admin-input" id="video3" placeholder="Video 3 URL" />
+                    <input class="admin-input" id="video4" placeholder="Video 4 URL" />
+                </div>
+                <div style="margin:8px 0;">
+                    <input type="file" id="videoFile" accept="video/*" style="display:none;" onchange="handleVideoUpload(this)" />
+                    <label class="file-label" for="videoFile" style="font-size:0.75rem;padding:6px 14px;">Subir video (MP4)</label>
+                    <span style="color:#666;font-size:0.75rem;margin-left:8px;">Se asigna al video 1</span>
+                </div>
+                <button class="admin-btn" onclick="updateVideos()">Actualizar</button>
+            </div>
+
+            <!-- Video Final 1920x1080 -->
+            <div class="admin-card">
+                <h3>Video Final (16:9)</h3>
+                <input class="admin-input" id="finalVideoInput" placeholder="URL video" />
+                <div style="margin:8px 0;">
+                    <input type="file" id="finalVideoFile" accept="video/*" style="display:none;" onchange="handleFinalVideoUpload(this)" />
+                    <label class="file-label" for="finalVideoFile" style="font-size:0.75rem;padding:6px 14px;">Subir video final</label>
+                </div>
+                <textarea class="admin-input" id="finalInfoInput" rows="3" placeholder="Información final..."></textarea>
+                <button class="admin-btn" onclick="updateFinalVideo()">Actualizar</button>
+            </div>
+
+            <!-- Secciones Informativas -->
+            <div class="admin-card">
+                <h3>Secciones Informativas</h3>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                    <input class="admin-input" id="infoTitulo" placeholder="Título" style="flex:1;min-width:100px;" />
+                    <input class="admin-input" id="infoImagen" placeholder="URL Imagen" style="flex:1;min-width:100px;" />
+                    <input type="file" id="infoImageFile" accept="image/*" style="display:none;" onchange="handleInfoImageUpload(this)" />
+                    <label class="file-label" for="infoImageFile" style="font-size:0.75rem;padding:6px 14px;">Subir</label>
+                </div>
+                <textarea class="admin-input" id="infoDescripcion" rows="2" placeholder="Descripción breve..."></textarea>
+                <button class="admin-btn" onclick="addInfoSection()">Agregar Sección</button>
+                <div style="max-height:200px; overflow-y:auto; margin-top:10px;">
+                    <table class="admin-table" id="adminInfoTable">
+                        <thead><tr><th>Título</th><th>Acciones</th></tr></thead>
+                        <tbody id="adminInfoBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:24px; text-align:center;">
+            <button class="admin-btn admin-btn-danger" onclick="resetAllData()">Resetear Datos</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ================================================================
+    // CONFIGURACIÓN DE FIREBASE
+    // ================================================================
+    const firebaseConfig = {
+        apiKey: "TU_API_KEY",
+        authDomain: "TU_PROYECTO.firebaseapp.com",
+        databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+        projectId: "TU_PROYECTO",
+        storageBucket: "TU_PROYECTO.appspot.com",
+        messagingSenderId: "TU_SENDER_ID",
+        appId: "TU_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // ================================================================
+    // DATA STORE
+    // ================================================================
+    let data = {
+        leagueName: 'HOPE FUTSAL LEAGUE',
+        leagueLogo: 'https://via.placeholder.com/60/cc0000/ffffff?text=H',
+        teams: [
+            { id: 1, name: 'Hope FC', logo: 'https://via.placeholder.com/30/cc0000/ffffff?text=H', pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 },
+            { id: 2, name: 'Red Bulls', logo: 'https://via.placeholder.com/30/990000/ffffff?text=R', pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 },
+            { id: 3, name: 'Golden Stars', logo: 'https://via.placeholder.com/30/cc0000/ffffff?text=G', pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 },
+            { id: 4, name: 'Shadow FC', logo: 'https://via.placeholder.com/30/990000/ffffff?text=S', pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 }
+        ],
+        jornadas: [
+            { id: 1, nombre: 'Jornada 1', fecha: '2026-08-01T20:00' },
+            { id: 2, nombre: 'Jornada 2', fecha: '2026-08-08T20:00' }
+        ],
+        matches: [
+            { id: 1, jornadaId: 1, local: 1, visitante: 2, golesLocal: 3, golesVisitante: 1, estado: 'finalizado' },
+            { id: 2, jornadaId: 1, local: 3, visitante: 4, golesLocal: 2, golesVisitante: 2, estado: 'finalizado' },
+            { id: 3, jornadaId: 2, local: 1, visitante: 3, golesLocal: null, golesVisitante: null, estado: 'pendiente' }
+        ],
+        mvp: { name: 'Carlos "El Mago" Pérez', photo: '' },
+        topScorers: [
+            { name: 'Luis "Cañón" Rodríguez', goals: 12, photo: '' },
+            { name: 'Andrés "El Tanque" Martínez', goals: 9, photo: '' },
+            { name: 'Javier "La Flecha" Gómez', goals: 7, photo: '' }
+        ],
+        videos: [
+            'https://www.w3schools.com/html/mov_bbb.mp4',
+            'https://www.w3schools.com/html/mov_bbb.mp4',
+            'https://www.w3schools.com/html/mov_bbb.mp4',
+            'https://www.w3schools.com/html/mov_bbb.mp4'
+        ],
+        finalVideo: 'https://www.w3schools.com/html/mov_bbb.mp4',
+        finalInfo: '🏆 Final HOPE FUTSAL 2026 - El partido definirá al campeón.',
+        sponsors: [
+            { image: 'https://via.placeholder.com/100/cc0000/ffffff?text=S1', link: '#' },
+            { image: 'https://via.placeholder.com/100/990000/ffffff?text=S2', link: '#' },
+            { image: 'https://via.placeholder.com/100/cc0000/ffffff?text=S3', link: '#' }
+        ],
+        infoSections: [
+            { id: 1, titulo: 'Bienvenidos a la HOPE FUTSAL LEAGUE', imagen: 'https://via.placeholder.com/600x200/cc0000/ffffff?text=Hope+Futsal', descripcion: 'La liga de futsal más emocionante de la región.' },
+            { id: 2, titulo: 'Formato de Competición', imagen: 'https://via.placeholder.com/600x200/ffd700/000000?text=Formato', descripcion: 'Liga regular con 14 jornadas, playoffs y gran final.' }
+        ],
+        nextTeamId: 5,
+        nextMatchId: 4,
+        nextJornadaId: 3,
+        nextInfoId: 3,
+        currentSlide: 0
+    };
+
+    // ================================================================
+    // FUNCIONES DE CARGA DE ARCHIVOS
+    // ================================================================
+
+    function handleFileUpload(input, imgId) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById(imgId);
+            if (img) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+            }
+            if (imgId === 'leagueLogoImg') {
+                data.leagueLogo = e.target.result;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleMVPhotoUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('mvpPhotoPreview');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            data.mvp.photo = e.target.result;
+            renderMVP();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleScorerPhotoUpload(input, previewId) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById(previewId);
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleTeamLogoUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('newTeamLogo').value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleInfoImageUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('infoImagen').value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleVideoUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('video1').value = e.target.result;
+            alert('✅ Video subido y asignado al slider 1');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleFinalVideoUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('finalVideoInput').value = e.target.result;
+            alert('✅ Video final subido');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleSponsorUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const link = document.getElementById('sponsorLinkInput').value.trim() || '#';
+            data.sponsors.push({ image: e.target.result, link: link });
+            renderAll();
+            alert('✅ Patrocinador añadido');
+            document.getElementById('sponsorLinkInput').value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ================================================================
+    // SCROLL SUAVE
+    // ================================================================
+
+    function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        document.querySelectorAll('.nav-bar a').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + id) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    // ================================================================
+    // LOGIN
+    // ================================================================
+
+    function openLogin() {
+        document.getElementById('loginOverlay').classList.add('active');
+    }
+
+    function closeLogin() {
+        document.getElementById('loginOverlay').classList.remove('active');
+    }
+
+    function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pass = document.getElementById('loginPassword').value.trim();
+        if (email === 'admin@hope.com' && pass === 'hope2026') {
+            alert('✅ Acceso concedido. ¡Bienvenido Super Administrador!');
+            closeLogin();
+            toggleAdmin();
+        } else {
+            alert('❌ Credenciales incorrectas. Usa: admin@hope.com / hope2026');
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLogin();
+    });
+
+    // ================================================================
+    // RENDER FUNCTIONS
+    // ================================================================
+
+    function calcularEstadisticas() {
+        data.teams.forEach(t => { t.pj = 0; t.g = 0; t.e = 0; t.p = 0; t.gf = 0; t.gc = 0; t.dg = 0; t.pts = 0; });
+        data.matches.forEach(m => {
+            if (m.estado !== 'finalizado' || m.golesLocal === null || m.golesVisitante === null) return;
+            const local = data.teams.find(t => t.id === m.local);
+            const visit = data.teams.find(t => t.id === m.visitante);
+            if (!local || !visit) return;
+            const gl = m.golesLocal, gv = m.golesVisitante;
+            local.pj += 1; visit.pj += 1;
+            local.gf += gl; local.gc += gv;
+            visit.gf += gv; visit.gc += gl;
+            if (gl > gv) { local.g += 1; local.pts += 3; visit.p += 1; }
+            else if (gl < gv) { visit.g += 1; visit.pts += 3; local.p += 1; }
+            else { local.e += 1; visit.e += 1; local.pts += 1; visit.pts += 1; }
+            local.dg = local.gf - local.gc;
+            visit.dg = visit.gf - visit.gc;
+        });
+    }
+
+    function renderPositions() {
+        const tbody = document.getElementById('positionsBody');
+        if (!tbody) return;
+        calcularEstadisticas();
+        const sorted = [...data.teams].sort((a,b) => b.pts - a.pts || b.dg - a.dg);
+        let html = '';
+        sorted.forEach((team, idx) => {
+            const cls = idx === 0 ? 'pos-1' : idx === 1 ? 'pos-2' : idx === 2 ? 'pos-3' : '';
+            html += `<tr class="${cls}">
+                <td>${idx + 1}</td>
+                <td><img src="${team.logo}" class="team-logo-mini" /> ${team.name}</td>
+                <td>${team.pj}</td><td>${team.g}</td><td>${team.e}</td><td>${team.p}</td>
+                <td>${team.gf}</td><td>${team.gc}</td><td>${team.dg}</td>
+                <td><strong>${team.pts}</strong></td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderMVP() {
+        // MVP
+        const mvpImage = document.getElementById('mvpImage');
+        const mvpImg = document.getElementById('mvpImageImg');
+        const mvpIcon = mvpImage.querySelector('i');
+        if (data.mvp.photo) {
+            mvpImg.src = data.mvp.photo;
+            mvpImg.style.display = 'block';
+            mvpIcon.style.display = 'none';
+        } else {
+            mvpImg.style.display = 'none';
+            mvpIcon.style.display = 'block';
+        }
+        document.getElementById('mvpNameDisplay').textContent = data.mvp.name || 'MVP';
+        
+        // Top 3 Scorers - sin medallas
+        const container = document.getElementById('topScorersContainer');
+        if (!container) return;
+        const positions = ['#1', '#2', '#3'];
+        const positionClasses = ['pos-1', 'pos-2', 'pos-3'];
+        let html = '';
+        data.topScorers.forEach((scorer, idx) => {
+            const photo = scorer.photo || '';
+            html += `
+                <div class="scorer-card ${positionClasses[idx] || ''}">
+                    <div class="scorer-image">
+                        ${photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;" />` : `<i class="fas fa-user"></i>`}
+                    </div>
+                    <div class="scorer-info">
+                        <div class="scorer-position">${positions[idx] || ''}</div>
+                        <h4>${scorer.name || 'Jugador'}</h4>
+                        <div class="scorer-goals">${scorer.goals || 0} <span>goles</span></div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderJornadas() {
+        const container = document.getElementById('jornadasContainer');
+        if (!container) return;
+        let html = '';
+        data.jornadas.forEach(j => {
+            const partidos = data.matches.filter(m => m.jornadaId === j.id);
+            const fecha = j.fecha ? new Date(j.fecha).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Sin fecha';
+            html += `
+                <div class="jornada-section">
+                    <div class="jornada-header">
+                        <h4>${j.nombre}</h4>
+                        <span class="jornada-fecha"><i class="far fa-calendar-alt"></i> ${fecha}</span>
+                    </div>
+                    <div class="calendar-grid">
+            `;
+            if (partidos.length === 0) {
+                html += '<p style="color:#666;padding:10px;">No hay partidos programados</p>';
+            } else {
+                partidos.forEach(m => {
+                    const local = data.teams.find(t => t.id === m.local);
+                    const visit = data.teams.find(t => t.id === m.visitante);
+                    if (!local || !visit) return;
+                    const resultado = (m.estado === 'finalizado' && m.golesLocal !== null && m.golesVisitante !== null)
+                        ? `${m.golesLocal} - ${m.golesVisitante}` : '⏳ Pendiente';
+                    const horaPartido = j.fecha ? new Date(j.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+                    html += `
+                        <div class="match-card">
+                            <div class="teams">
+                                <img src="${local.logo}" /> ${local.name}
+                                <span style="color:#666;font-size:0.7rem;">vs</span>
+                                <img src="${visit.logo}" /> ${visit.name}
+                            </div>
+                            <div class="result">${resultado}</div>
+                            ${horaPartido ? `<div class="match-hora"><i class="far fa-clock"></i> ${horaPartido}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+            html += `</div></div>`;
+        });
+        container.innerHTML = html || '<p style="color:#666;">No hay jornadas registradas.</p>';
+    }
+
+    function renderResults() {
+        const grid = document.getElementById('resultsGrid');
+        if (!grid) return;
+        const finalizados = data.matches.filter(m => m.estado === 'finalizado' && m.golesLocal !== null && m.golesVisitante !== null);
+        let html = '';
+        if (finalizados.length === 0) {
+            html = '<p style="color:#666;">No hay resultados disponibles.</p>';
+        } else {
+            finalizados.forEach(m => {
+                const local = data.teams.find(t => t.id === m.local);
+                const visit = data.teams.find(t => t.id === m.visitante);
+                if (!local || !visit) return;
+                const jornada = data.jornadas.find(j => j.id === m.jornadaId);
+                const horaPartido = jornada && jornada.fecha ? new Date(jornada.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+                html += `
+                    <div class="match-card">
+                        <div class="teams">
+                            <img src="${local.logo}" /> ${local.name}
+                            <span style="color:#666;font-size:0.7rem;">vs</span>
+                            <img src="${visit.logo}" /> ${visit.name}
+                        </div>
+                        <div class="result">${m.golesLocal} - ${m.golesVisitante}</div>
+                        ${jornada ? `<div class="match-hora"><i class="far fa-calendar-alt"></i> ${jornada.nombre} ${horaPartido ? '· ' + horaPartido : ''}</div>` : ''}
+                    </div>
+                `;
+            });
+        }
+        grid.innerHTML = html;
+    }
+
+    function renderSlider() {
+        const track = document.getElementById('sliderTrack');
+        const dots = document.getElementById('sliderDots');
+        if (!track || !dots) return;
+        let slidesHtml = '';
+        data.videos.forEach((video, i) => {
+            const isVideo = video && (video.startsWith('data:video') || video.includes('.mp4') || video.includes('mov_bbb'));
+            slidesHtml += `
+                <div class="slider-slide">
+                    ${isVideo ? `<video autoplay muted loop playsinline><source src="${video}" type="video/mp4" /></video>` : `<img src="${video}" alt="Slide ${i+1}" />`}
+                    <div class="overlay">
+                        <h2>HOPE FUTSAL LEAGUE</h2>
+                        <p>Video ${i+1}</p>
+                    </div>
+                </div>
+            `;
+        });
+        track.innerHTML = slidesHtml;
+        let dotsHtml = '';
+        data.videos.forEach((_, i) => {
+            dotsHtml += `<div class="slider-dot ${i === data.currentSlide ? 'active' : ''}" onclick="goToSlide(${i})"></div>`;
+        });
+        dots.innerHTML = dotsHtml;
+        updateSliderPosition();
+    }
+
+    function updateSliderPosition() {
+        const track = document.getElementById('sliderTrack');
+        if (track) track.style.transform = `translateX(-${data.currentSlide * 100}%)`;
+        document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === data.currentSlide);
+        });
+    }
+
+    function changeSlide(dir) {
+        const total = data.videos.length;
+        data.currentSlide = (data.currentSlide + dir + total) % total;
+        updateSliderPosition();
+    }
+
+    function goToSlide(idx) {
+        data.currentSlide = idx;
+        updateSliderPosition();
+    }
+
+    function renderSponsors() {
+        const track = document.getElementById('sponsorsTrack');
+        if (!track) return;
+        // Duplicar para efecto infinito
+        const all = [...data.sponsors, ...data.sponsors];
+        let html = '';
+        all.forEach(sponsor => {
+            const image = typeof sponsor === 'string' ? sponsor : sponsor.image;
+            const link = typeof sponsor === 'string' ? '#' : (sponsor.link || '#');
+            html += `
+                <a href="${link}" target="_blank" class="sponsor-link" rel="noopener noreferrer">
+                    <img src="${image}" alt="Patrocinador" />
+                </a>
+            `;
+        });
+        track.innerHTML = html;
+    }
+
+    function renderFinalVideo() {
+        const video = document.getElementById('finalVideo');
+        if (video) {
+            const source = video.querySelector('source');
+            if (source) source.src = data.finalVideo;
+            video.load();
+        }
+        document.getElementById('finalInfoText').textContent = data.finalInfo || 'Información de la final';
+    }
+
+    function renderInfoSections() {
+        const grid = document.getElementById('infoSectionsGrid');
+        if (!grid) return;
+        let html = '';
+        data.infoSections.forEach(info => {
+            html += `
+                <div class="info-card">
+                    <img src="${info.imagen || 'https://via.placeholder.com/600x200/333333/666666?text=Imagen'}" class="info-image" alt="${info.titulo}" />
+                    <div class="info-content">
+                        <h3>${info.titulo}</h3>
+                        <p>${info.descripcion || ''}</p>
+                    </div>
+                </div>
+            `;
+        });
+        grid.innerHTML = html || '<p style="color:#666;">No hay secciones informativas.</p>';
+    }
+
+    function renderLeagueConfig() {
+        document.querySelector('.logo-text').innerHTML = `HOPE <span>FUTSAL</span>`;
+        const img = document.getElementById('leagueLogoImg');
+        if (img) img.src = data.leagueLogo || 'https://via.placeholder.com/60/cc0000/ffffff?text=H';
+        document.getElementById('leagueNameInput').value = data.leagueName;
+    }
+
+    // ================================================================
+    // ADMIN RENDERS
+    // ================================================================
+
+    function renderAdminTeams() {
+        const tbody = document.getElementById('adminTeamsBody');
+        if (!tbody) return;
+        let html = '';
+        data.teams.forEach(team => {
+            html += `
+                <tr>
+                    <td><img src="${team.logo}" style="width:28px;height:28px;object-fit:contain;" /></td>
+                    <td>
+                        <input type="text" value="${team.name}" id="teamName_${team.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;" />
+                        <input type="text" value="${team.logo}" id="teamLogo_${team.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;margin-top:4px;font-size:0.7rem;" />
+                    </td>
+                    <td>
+                        <button class="admin-btn admin-btn-sm" onclick="updateTeam(${team.id})"><i class="fas fa-save"></i></button>
+                        <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="deleteTeam(${team.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderAdminJornadas() {
+        const tbody = document.getElementById('adminJornadasBody');
+        if (!tbody) return;
+        let html = '';
+        data.jornadas.forEach(j => {
+            const fecha = j.fecha || '';
+            html += `
+                <tr>
+                    <td>
+                        <input type="text" value="${j.nombre}" id="jornadaNombre_${j.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;" />
+                    </td>
+                    <td>
+                        <input type="datetime-local" value="${fecha}" id="jornadaFecha_${j.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;" />
+                    </td>
+                    <td>
+                        <button class="admin-btn admin-btn-sm" onclick="updateJornada(${j.id})"><i class="fas fa-save"></i></button>
+                        <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="deleteJornada(${j.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderAdminMatches() {
+        const tbody = document.getElementById('adminMatchesBody');
+        if (!tbody) return;
+        let html = '';
+        data.matches.forEach(m => {
+            const local = data.teams.find(t => t.id === m.local);
+            const visit = data.teams.find(t => t.id === m.visitante);
+            const jornada = data.jornadas.find(j => j.id === m.jornadaId);
+            if (!local || !visit) return;
+            const res = (m.estado === 'finalizado' && m.golesLocal !== null && m.golesVisitante !== null)
+                ? `${m.golesLocal}-${m.golesVisitante}` : 'pendiente';
+            html += `
+                <tr>
+                    <td>${jornada ? jornada.nombre : 'Sin jornada'}</td>
+                    <td>${local.name}</td>
+                    <td>${visit.name}</td>
+                    <td>
+                        <input type="text" value="${res}" id="matchResult_${m.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:70px;" />
+                        <select id="matchStatus_${m.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px;">
+                            <option value="pendiente" ${m.estado==='pendiente'?'selected':''}>Pendiente</option>
+                            <option value="finalizado" ${m.estado==='finalizado'?'selected':''}>Finalizado</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="admin-btn admin-btn-sm" onclick="updateMatch(${m.id})"><i class="fas fa-save"></i></button>
+                        <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="deleteMatch(${m.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function renderAdminSponsors() {
+        const container = document.getElementById('sponsorList');
+        if (!container) return;
+        let html = '';
+        data.sponsors.forEach((sponsor, idx) => {
+            const image = typeof sponsor === 'string' ? sponsor : sponsor.image;
+            const link = typeof sponsor === 'string' ? '#' : (sponsor.link || '#');
+            html += `
+                <div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.3);padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);">
+                    <img src="${image}" style="height:30px;object-fit:contain;" />
+                    <span style="color:#666;font-size:0.65rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${link}</span>
+                    <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="removeSponsor(${idx})"><i class="fas fa-times"></i></button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderAdminInfo() {
+        const tbody = document.getElementById('adminInfoBody');
+        if (!tbody) return;
+        let html = '';
+        data.infoSections.forEach(info => {
+            html += `
+                <tr>
+                    <td>
+                        <input type="text" value="${info.titulo}" id="infoTitulo_${info.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;" />
+                        <input type="text" value="${info.imagen || ''}" id="infoImagen_${info.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;margin-top:4px;font-size:0.7rem;" />
+                        <input type="text" value="${info.descripcion || ''}" id="infoDesc_${info.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;margin-top:4px;font-size:0.7rem;" />
+                    </td>
+                    <td>
+                        <button class="admin-btn admin-btn-sm" onclick="updateInfoSection(${info.id})"><i class="fas fa-save"></i></button>
+                        <button class="admin-btn admin-btn-sm admin-btn-danger" onclick="deleteInfoSection(${info.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+    }
+
+    function populateSelects() {
+        const localSelect = document.getElementById('matchLocal');
+        const visitSelect = document.getElementById('matchVisit');
+        const jornadaSelect = document.getElementById('matchJornada');
+        if (!localSelect || !visitSelect || !jornadaSelect) return;
+        const teamOptions = data.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+        localSelect.innerHTML = teamOptions;
+        visitSelect.innerHTML = teamOptions;
+        const jornadaOptions = data.jornadas.map(j => `<option value="${j.id}">${j.nombre}</option>`).join('');
+        jornadaSelect.innerHTML = jornadaOptions;
+    }
+
+    // ================================================================
+    // ADMIN ACTIONS
+    // ================================================================
+
+    function addTeam() {
+        const name = document.getElementById('newTeamName').value.trim() || 'Equipo';
+        const logo = document.getElementById('newTeamLogo').value.trim() || 'https://via.placeholder.com/30/cc0000/ffffff?text=H';
+        data.teams.push({ id: data.nextTeamId++, name, logo, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 });
+        document.getElementById('newTeamName').value = '';
+        document.getElementById('newTeamLogo').value = '';
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateTeam(id) {
+        const nameInput = document.getElementById(`teamName_${id}`);
+        const logoInput = document.getElementById(`teamLogo_${id}`);
+        if (!nameInput || !logoInput) return;
+        const team = data.teams.find(t => t.id === id);
+        if (team) {
+            team.name = nameInput.value.trim() || team.name;
+            team.logo = logoInput.value.trim() || team.logo;
+        }
+        renderAll();
+        syncToFirebase();
+    }
+
+    function deleteTeam(id) {
+        if (!confirm('¿Eliminar equipo y sus partidos?')) return;
+        data.teams = data.teams.filter(t => t.id !== id);
+        data.matches = data.matches.filter(m => m.local !== id && m.visitante !== id);
+        renderAll();
+        syncToFirebase();
+    }
+
+    function addJornada() {
+        const nombre = document.getElementById('newJornadaNombre').value.trim() || `Jornada ${data.jornadas.length + 1}`;
+        const fecha = document.getElementById('newJornadaFecha').value;
+        data.jornadas.push({ id: data.nextJornadaId++, nombre, fecha });
+        document.getElementById('newJornadaNombre').value = '';
+        document.getElementById('newJornadaFecha').value = '';
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateJornada(id) {
+        const nombreInput = document.getElementById(`jornadaNombre_${id}`);
+        const fechaInput = document.getElementById(`jornadaFecha_${id}`);
+        if (!nombreInput || !fechaInput) return;
+        const jornada = data.jornadas.find(j => j.id === id);
+        if (jornada) {
+            jornada.nombre = nombreInput.value.trim() || jornada.nombre;
+            jornada.fecha = fechaInput.value || '';
+        }
+        renderAll();
+        syncToFirebase();
+    }
+
+    function deleteJornada(id) {
+        if (!confirm('¿Eliminar jornada y sus partidos?')) return;
+        data.jornadas = data.jornadas.filter(j => j.id !== id);
+        data.matches = data.matches.filter(m => m.jornadaId !== id);
+        renderAll();
+        syncToFirebase();
+    }
+
+    function addMatch() {
+        const jornadaId = parseInt(document.getElementById('matchJornada').value);
+        const localId = parseInt(document.getElementById('matchLocal').value);
+        const visitId = parseInt(document.getElementById('matchVisit').value);
+        if (localId === visitId) { alert('Local y visitante deben ser distintos'); return; }
+        data.matches.push({ id: data.nextMatchId++, jornadaId, local: localId, visitante: visitId, golesLocal: null, golesVisitante: null, estado: 'pendiente' });
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateMatch(id) {
+        const resultInput = document.getElementById(`matchResult_${id}`);
+        const statusSelect = document.getElementById(`matchStatus_${id}`);
+        if (!resultInput || !statusSelect) return;
+        const match = data.matches.find(m => m.id === id);
+        if (!match) return;
+        const val = resultInput.value.trim();
+        if (val === 'pendiente' || val === '') {
+            match.golesLocal = null; match.golesVisitante = null; match.estado = 'pendiente';
+        } else {
+            const parts = val.split('-').map(Number);
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                match.golesLocal = parts[0]; match.golesVisitante = parts[1];
+                match.estado = statusSelect.value === 'finalizado' ? 'finalizado' : 'pendiente';
+            } else {
+                alert('Formato incorrecto. Usa ej: 3-1');
+                return;
+            }
+        }
+        renderAll();
+        syncToFirebase();
+    }
+
+    function deleteMatch(id) {
+        if (!confirm('¿Eliminar partido?')) return;
+        data.matches = data.matches.filter(m => m.id !== id);
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateMVPAndScorers() {
+        // MVP
+        const mvpName = document.getElementById('mvpNameInput').value.trim();
+        if (mvpName) data.mvp.name = mvpName;
+        
+        // Scorer 1
+        const s1Name = document.getElementById('scorer1Name').value.trim();
+        const s1Goals = document.getElementById('scorer1Goals').value.trim();
+        const s1Photo = document.getElementById('scorer1PhotoPreview').src;
+        if (s1Name) data.topScorers[0].name = s1Name;
+        if (s1Goals) data.topScorers[0].goals = parseInt(s1Goals) || data.topScorers[0].goals;
+        if (s1Photo && !s1Photo.includes('file-preview')) data.topScorers[0].photo = s1Photo;
+        
+        // Scorer 2
+        const s2Name = document.getElementById('scorer2Name').value.trim();
+        const s2Goals = document.getElementById('scorer2Goals').value.trim();
+        const s2Photo = document.getElementById('scorer2PhotoPreview').src;
+        if (s2Name) data.topScorers[1].name = s2Name;
+        if (s2Goals) data.topScorers[1].goals = parseInt(s2Goals) || data.topScorers[1].goals;
+        if (s2Photo && !s2Photo.includes('file-preview')) data.topScorers[1].photo = s2Photo;
+        
+        // Scorer 3
+        const s3Name = document.getElementById('scorer3Name').value.trim();
+        const s3Goals = document.getElementById('scorer3Goals').value.trim();
+        const s3Photo = document.getElementById('scorer3PhotoPreview').src;
+        if (s3Name) data.topScorers[2].name = s3Name;
+        if (s3Goals) data.topScorers[2].goals = parseInt(s3Goals) || data.topScorers[2].goals;
+        if (s3Photo && !s3Photo.includes('file-preview')) data.topScorers[2].photo = s3Photo;
+        
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateVideos() {
+        const urls = [];
+        for (let i = 1; i <= 4; i++) {
+            const input = document.getElementById(`video${i}`);
+            if (input && input.value.trim()) urls.push(input.value.trim());
+        }
+        if (urls.length === 4) { data.videos = urls; data.currentSlide = 0; renderAll(); syncToFirebase(); }
+        else alert('Completa los 4 videos con URL válidas');
+    }
+
+    function updateFinalVideo() {
+        const url = document.getElementById('finalVideoInput').value.trim();
+        const info = document.getElementById('finalInfoInput').value.trim();
+        if (url) data.finalVideo = url;
+        if (info) data.finalInfo = info;
+        renderAll();
+        syncToFirebase();
+    }
+
+    function addSponsor() {
+        const image = document.getElementById('sponsorInput').value.trim();
+        const link = document.getElementById('sponsorLinkInput').value.trim() || '#';
+        if (image) {
+            data.sponsors.push({ image, link });
+            document.getElementById('sponsorInput').value = '';
+            document.getElementById('sponsorLinkInput').value = '';
+            renderAll();
+            syncToFirebase();
+        }
+    }
+
+    function removeSponsor(idx) {
+        data.sponsors.splice(idx, 1);
+        renderAll();
+        syncToFirebase();
+    }
+
+    function addInfoSection() {
+        const titulo = document.getElementById('infoTitulo').value.trim() || 'Nueva Sección';
+        const imagen = document.getElementById('infoImagen').value.trim() || '';
+        const descripcion = document.getElementById('infoDescripcion').value.trim() || '';
+        data.infoSections.push({ id: data.nextInfoId++, titulo, imagen, descripcion });
+        document.getElementById('infoTitulo').value = '';
+        document.getElementById('infoImagen').value = '';
+        document.getElementById('infoDescripcion').value = '';
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateInfoSection(id) {
+        const tituloInput = document.getElementById(`infoTitulo_${id}`);
+        const imagenInput = document.getElementById(`infoImagen_${id}`);
+        const descInput = document.getElementById(`infoDesc_${id}`);
+        if (!tituloInput || !imagenInput || !descInput) return;
+        const info = data.infoSections.find(i => i.id === id);
+        if (info) {
+            info.titulo = tituloInput.value.trim() || info.titulo;
+            info.imagen = imagenInput.value.trim() || info.imagen;
+            info.descripcion = descInput.value.trim() || info.descripcion;
+        }
+        renderAll();
+        syncToFirebase();
+    }
+
+    function deleteInfoSection(id) {
+        if (!confirm('¿Eliminar esta sección informativa?')) return;
+        data.infoSections = data.infoSections.filter(i => i.id !== id);
+        renderAll();
+        syncToFirebase();
+    }
+
+    function updateLeagueConfig() {
+        const name = document.getElementById('leagueNameInput').value.trim();
+        if (name) data.leagueName = name;
+        renderAll();
+        syncToFirebase();
+    }
+
+    // ================================================================
+    // FIREBASE SYNC
+    // ================================================================
+
+    function syncToFirebase() {
+        const dataToSync = {
+            leagueName: data.leagueName,
+            leagueLogo: data.leagueLogo,
+            teams: data.teams,
+            jornadas: data.jornadas,
+            matches: data.matches,
+            mvp: data.mvp,
+            topScorers: data.topScorers,
+            videos: data.videos,
+            finalVideo: data.finalVideo,
+            finalInfo: data.finalInfo,
+            sponsors: data.sponsors,
+            infoSections: data.infoSections,
+            nextTeamId: data.nextTeamId,
+            nextMatchId: data.nextMatchId,
+            nextJornadaId: data.nextJornadaId,
+            nextInfoId: data.nextInfoId,
+            currentSlide: data.currentSlide
+        };
+        database.ref('hopeFutsal').set(dataToSync)
+            .then(() => console.log('✅ Datos sincronizados con Firebase'))
+            .catch((error) => {
+                console.error('❌ Error al sincronizar:', error);
+                alert('⚠️ Error al guardar en Firebase. Revisa tu configuración.');
+            });
+    }
+
+    function loadFromFirebase() {
+        database.ref('hopeFutsal').once('value')
+            .then((snapshot) => {
+                const firebaseData = snapshot.val();
+                if (firebaseData) {
+                    Object.assign(data, firebaseData);
+                    if (!data.teams) data.teams = [];
+                    if (!data.jornadas) data.jornadas = [];
+                    if (!data.matches) data.matches = [];
+                    if (!data.topScorers || data.topScorers.length === 0) {
+                        data.topScorers = [
+                            { name: 'Luis "Cañón" Rodríguez', goals: 12, photo: '' },
+                            { name: 'Andrés "El Tanque" Martínez', goals: 9, photo: '' },
+                            { name: 'Javier "La Flecha" Gómez', goals: 7, photo: '' }
+                        ];
+                    }
+                    if (!data.videos || data.videos.length === 0) {
+                        data.videos = ['https://www.w3schools.com/html/mov_bbb.mp4','https://www.w3schools.com/html/mov_bbb.mp4','https://www.w3schools.com/html/mov_bbb.mp4','https://www.w3schools.com/html/mov_bbb.mp4'];
+                    }
+                    if (!data.sponsors) data.sponsors = [];
+                    if (!data.infoSections) data.infoSections = [];
+                    renderAll();
+                    console.log('✅ Datos cargados desde Firebase');
+                } else {
+                    syncToFirebase();
+                }
+            })
+            .catch((error) => {
+                console.error('❌ Error al cargar desde Firebase:', error);
+                loadFromLocalStorage();
+            });
+    }
+
+    // ================================================================
+    // PERSISTENCIA LOCAL
+    // ================================================================
+
+    function saveToLocalStorage() {
+        try { localStorage.setItem('hopeFutsalData', JSON.stringify(data)); } catch(e) {}
+    }
+
+    function loadFromLocalStorage() {
+        try {
+            const raw = localStorage.getItem('hopeFutsalData');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                Object.assign(data, parsed);
+                if (!data.teams) data.teams = [];
+                if (!data.jornadas) data.jornadas = [];
+                if (!data.matches) data.matches = [];
+                if (!data.topScorers || data.topScorers.length === 0) {
+                    data.topScorers = [
+                        { name: 'Luis "Cañón" Rodríguez', goals: 12, photo: '' },
+                        { name: 'Andrés "El Tanque" Martínez', goals: 9, photo: '' },
+                        { name: 'Javier "La Flecha" Gómez', goals: 7, photo: '' }
+                    ];
+                }
+                if (!data.videos || data.videos.length === 0) {
+                    data.videos = ['https://www.w3schools.com/html/mov_bbb.mp4','https://www.w3schools.com/html/mov_bbb.mp4','https://www.w3schools.com/html/mov_bbb.mp4','https://www.w3schools.com/html/mov_bbb.mp4'];
+                }
+                if (!data.sponsors) data.sponsors = [];
+                if (!data.infoSections) data.infoSections = [];
+                renderAll();
+                return true;
+            }
+        } catch(e) {}
+        return false;
+    }
+
+    function saveAllData() {
+        syncToFirebase();
+        saveToLocalStorage();
+        alert('✅ Datos guardados en Firebase y localStorage.');
+    }
+
+    function resetAllData() {
+        if (!confirm('⚠️ ¿Restablecer datos de ejemplo?')) return;
+        localStorage.removeItem('hopeFutsalData');
+        location.reload();
+    }
+
+    // ================================================================
+    // ADMIN TOGGLE
+    // ================================================================
+
+    function toggleAdmin() {
+        const panel = document.getElementById('adminPanel');
+        panel.classList.toggle('active');
+        if (panel.classList.contains('active')) {
+            renderAdminTeams();
+            renderAdminJornadas();
+            renderAdminMatches();
+            renderAdminSponsors();
+            renderAdminInfo();
+            populateSelects();
+            
+            // Cargar datos en el panel
+            document.getElementById('mvpNameInput').value = data.mvp.name || '';
+            if (data.mvp.photo) {
+                document.getElementById('mvpPhotoPreview').src = data.mvp.photo;
+                document.getElementById('mvpPhotoPreview').style.display = 'block';
+            }
+            
+            // Scorer 1
+            document.getElementById('scorer1Name').value = data.topScorers[0]?.name || '';
+            document.getElementById('scorer1Goals').value = data.topScorers[0]?.goals || '';
+            if (data.topScorers[0]?.photo) {
+                document.getElementById('scorer1PhotoPreview').src = data.topScorers[0].photo;
+                document.getElementById('scorer1PhotoPreview').style.display = 'block';
+            }
+            
+            // Scorer 2
+            document.getElementById('scorer2Name').value = data.topScorers[1]?.name || '';
+            document.getElementById('scorer2Goals').value = data.topScorers[1]?.goals || '';
+            if (data.topScorers[1]?.photo) {
+                document.getElementById('scorer2PhotoPreview').src = data.topScorers[1].photo;
+                document.getElementById('scorer2PhotoPreview').style.display = 'block';
+            }
+            
+            // Scorer 3
+            document.getElementById('scorer3Name').value = data.topScorers[2]?.name || '';
+            document.getElementById('scorer3Goals').value = data.topScorers[2]?.goals || '';
+            if (data.topScorers[2]?.photo) {
+                document.getElementById('scorer3PhotoPreview').src = data.topScorers[2].photo;
+                document.getElementById('scorer3PhotoPreview').style.display = 'block';
+            }
+            
+            document.getElementById('finalVideoInput').value = data.finalVideo || '';
+            document.getElementById('finalInfoInput').value = data.finalInfo || '';
+            data.videos.forEach((url, i) => {
+                const inp = document.getElementById(`video${i+1}`);
+                if (inp) inp.value = url;
+            });
+        }
+    }
+
+    // ================================================================
+    // RENDER ALL
+    // ================================================================
+
+    function renderAll() {
+        renderLeagueConfig();
+        renderSlider();
+        renderPositions();
+        renderJornadas();
+        renderResults();
+        renderMVP();
+        renderSponsors();
+        renderFinalVideo();
+        renderInfoSections();
+        renderAdminTeams();
+        renderAdminJornadas();
+        renderAdminMatches();
+        renderAdminSponsors();
+        renderAdminInfo();
+        populateSelects();
+        saveToLocalStorage();
+    }
+
+    // ================================================================
+    // INIT
+    // ================================================================
+
+    loadFromFirebase();
+
+    setInterval(() => {
+        if (!document.getElementById('adminPanel').classList.contains('active')) {
+            changeSlide(1);
+        }
+    }, 5000);
+
+    // Exponer funciones globales
+    window.openLogin = openLogin;
+    window.closeLogin = closeLogin;
+    window.handleLogin = handleLogin;
+    window.toggleAdmin = toggleAdmin;
+    window.changeSlide = changeSlide;
+    window.goToSlide = goToSlide;
+    window.scrollToSection = scrollToSection;
+    window.addTeam = addTeam;
+    window.updateTeam = updateTeam;
+    window.deleteTeam = deleteTeam;
+    window.addJornada = addJornada;
+    window.updateJornada = updateJornada;
+    window.deleteJornada = deleteJornada;
+    window.addMatch = addMatch;
+    window.updateMatch = updateMatch;
+    window.deleteMatch = deleteMatch;
+    window.updateMVPAndScorers = updateMVPAndScorers;
+    window.updateVideos = updateVideos;
+    window.updateFinalVideo = updateFinalVideo;
+    window.addSponsor = addSponsor;
+    window.removeSponsor = removeSponsor;
+    window.addInfoSection = addInfoSection;
+    window.updateInfoSection = updateInfoSection;
+    window.deleteInfoSection = deleteInfoSection;
+    window.updateLeagueConfig = updateLeagueConfig;
+    window.saveAllData = saveAllData;
+    window.resetAllData = resetAllData;
+    window.renderAll = renderAll;
+    window.handleFileUpload = handleFileUpload;
+    window.handleMVPhotoUpload = handleMVPhotoUpload;
+    window.handleScorerPhotoUpload = handleScorerPhotoUpload;
+    window.handleTeamLogoUpload = handleTeamLogoUpload;
+    window.handleInfoImageUpload = handleInfoImageUpload;
+    window.handleVideoUpload = handleVideoUpload;
+    window.handleFinalVideoUpload = handleFinalVideoUpload;
+    window.handleSponsorUpload = handleSponsorUpload;
+
+    console.log('🔥 HOPE FUTSAL LEAGUE · Login: admin@hope.com / hope2026');
+    console.log('📁 Puedes subir imágenes y videos desde el dispositivo');
+    console.log('☁️ Configura Firebase para sincronización en tiempo real');
+    console.log('📐 Formatos: Videos e imágenes en 1920x1080 (16:9)');
+    console.log('🏆 3 Máximos Goleadores sin medallas');
+    console.log('🔗 Patrocinadores con enlaces a redes sociales');
+</script>
+
+</body>
+</html>
