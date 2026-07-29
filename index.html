@@ -1084,6 +1084,39 @@
             border: 1px solid rgba(255,255,255,0.06);
         }
 
+        /* Estilo para campos de subida de imágenes en admin */
+        .upload-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .upload-group .file-label {
+            background: rgba(255,255,255,0.06);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: var(--font);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: 0.3s;
+        }
+        .upload-group .file-label:hover {
+            border-color: var(--amarillo);
+            transform: translateY(-2px);
+        }
+        .upload-group input[type="file"] { display: none; }
+        .upload-group .preview-img {
+            max-width: 50px;
+            max-height: 50px;
+            object-fit: contain;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
         @media (max-width: 768px) {
             body { padding-top: 98px; }
             .top-header { padding: 0 16px; height: 56px; }
@@ -1282,12 +1315,12 @@
                 <h3>Equipos</h3>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
                     <input class="admin-input" id="newTeamName" placeholder="Nombre" style="flex:1;min-width:100px;" />
-                    <input class="admin-input" id="newTeamLogo" placeholder="Logo URL" style="flex:1;min-width:100px;" />
+                    <div class="upload-group" style="width:100%;">
+                        <input type="file" id="teamLogoFile" accept="image/*" onchange="handleTeamLogoUpload(this)" />
+                        <label class="file-label" for="teamLogoFile"><i class="fas fa-upload"></i> Logo equipo</label>
+                        <img id="teamLogoPreview" class="preview-img" style="display:none;" />
+                    </div>
                     <button class="admin-btn" onclick="addTeam()"><i class="fas fa-plus"></i></button>
-                </div>
-                <div style="display:flex; gap:6px; margin-bottom:12px;">
-                    <input type="file" id="teamLogoFile" accept="image/*" style="display:none;" onchange="handleTeamLogoUpload(this)" />
-                    <label class="file-label" for="teamLogoFile" style="font-size:0.75rem;padding:6px 14px;">Subir logo equipo</label>
                 </div>
                 <div style="max-height:280px; overflow-y:auto;">
                     <table class="admin-table" id="adminTeamsTable">
@@ -1377,17 +1410,17 @@
                 <button class="admin-btn" onclick="updateMVPAndScorers()" style="margin-top:10px;">Actualizar</button>
             </div>
 
-            <!-- Patrocinadores con enlaces -->
+            <!-- Patrocinadores con subida de imagen y enlace -->
             <div class="admin-card">
                 <h3>Patrocinadores</h3>
                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                    <input class="admin-input" id="sponsorInput" placeholder="URL logo" style="flex:2;" />
                     <input class="admin-input" id="sponsorLinkInput" placeholder="URL enlace (red social)" style="flex:2;" />
+                    <div class="upload-group" style="flex:1; min-width:120px;">
+                        <input type="file" id="sponsorFile" accept="image/*" onchange="handleSponsorUpload(this)" />
+                        <label class="file-label" for="sponsorFile" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-upload"></i> Logo</label>
+                        <img id="sponsorPreview" class="preview-img" style="display:none;max-height:40px;" />
+                    </div>
                     <button class="admin-btn" onclick="addSponsor()"><i class="fas fa-plus"></i></button>
-                </div>
-                <div style="display:flex; gap:6px; margin-bottom:10px;">
-                    <input type="file" id="sponsorFile" accept="image/*" style="display:none;" onchange="handleSponsorUpload(this)" />
-                    <label class="file-label" for="sponsorFile" style="font-size:0.75rem;padding:6px 14px;">Subir patrocinador</label>
                 </div>
                 <div id="sponsorList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
             </div>
@@ -1396,14 +1429,14 @@
             <div class="admin-card">
                 <h3>Videos Slider (16:9)</h3>
                 <div id="videoInputs">
-                    <input class="admin-input" id="video1" placeholder="Video 1 URL" />
-                    <input class="admin-input" id="video2" placeholder="Video 2 URL" />
-                    <input class="admin-input" id="video3" placeholder="Video 3 URL" />
-                    <input class="admin-input" id="video4" placeholder="Video 4 URL" />
+                    <input class="admin-input" id="video1" placeholder="Video 1 URL (GitHub)" />
+                    <input class="admin-input" id="video2" placeholder="Video 2 URL (GitHub)" />
+                    <input class="admin-input" id="video3" placeholder="Video 3 URL (GitHub)" />
+                    <input class="admin-input" id="video4" placeholder="Video 4 URL (GitHub)" />
                 </div>
                 <div style="margin:8px 0;">
                     <input type="file" id="videoFile" accept="video/*" style="display:none;" onchange="handleVideoUpload(this)" />
-                    <label class="file-label" for="videoFile" style="font-size:0.75rem;padding:6px 14px;">Subir video (MP4)</label>
+                    <label class="file-label" for="videoFile" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-upload"></i> Subir video (MP4)</label>
                     <span style="color:#666;font-size:0.75rem;margin-left:8px;">Se asigna al video 1</span>
                 </div>
                 <button class="admin-btn" onclick="updateVideos()">Actualizar</button>
@@ -1412,10 +1445,10 @@
             <!-- Video Final 1920x1080 -->
             <div class="admin-card">
                 <h3>Video Final (16:9)</h3>
-                <input class="admin-input" id="finalVideoInput" placeholder="URL video" />
+                <input class="admin-input" id="finalVideoInput" placeholder="URL video (GitHub)" />
                 <div style="margin:8px 0;">
                     <input type="file" id="finalVideoFile" accept="video/*" style="display:none;" onchange="handleFinalVideoUpload(this)" />
-                    <label class="file-label" for="finalVideoFile" style="font-size:0.75rem;padding:6px 14px;">Subir video final</label>
+                    <label class="file-label" for="finalVideoFile" style="font-size:0.75rem;padding:6px 14px;"><i class="fas fa-upload"></i> Subir video final</label>
                 </div>
                 <textarea class="admin-input" id="finalInfoInput" rows="3" placeholder="Información final..."></textarea>
                 <button class="admin-btn" onclick="updateFinalVideo()">Actualizar</button>
@@ -1566,12 +1599,34 @@
         reader.readAsDataURL(file);
     }
 
+    let pendingTeamLogo = null;
     function handleTeamLogoUpload(input) {
         const file = input.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function(e) {
-            document.getElementById('newTeamLogo').value = e.target.result;
+            pendingTeamLogo = e.target.result;
+            const preview = document.getElementById('teamLogoPreview');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    let pendingSponsorImage = null;
+    function handleSponsorUpload(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            pendingSponsorImage = e.target.result;
+            const preview = document.getElementById('sponsorPreview');
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
         };
         reader.readAsDataURL(file);
     }
@@ -1604,20 +1659,6 @@
         reader.onload = function(e) {
             document.getElementById('finalVideoInput').value = e.target.result;
             alert('✅ Video final subido');
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function handleSponsorUpload(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const link = document.getElementById('sponsorLinkInput').value.trim() || '#';
-            data.sponsors.push({ image: e.target.result, link: link });
-            renderAll();
-            alert('✅ Patrocinador añadido');
-            document.getElementById('sponsorLinkInput').value = '';
         };
         reader.readAsDataURL(file);
     }
@@ -1869,7 +1910,6 @@
     function renderSponsors() {
         const track = document.getElementById('sponsorsTrack');
         if (!track) return;
-        // Duplicar para efecto infinito
         const all = [...data.sponsors, ...data.sponsors];
         let html = '';
         all.forEach(sponsor => {
@@ -1933,7 +1973,11 @@
                     <td><img src="${team.logo}" style="width:28px;height:28px;object-fit:contain;" /></td>
                     <td>
                         <input type="text" value="${team.name}" id="teamName_${team.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;" />
-                        <input type="text" value="${team.logo}" id="teamLogo_${team.id}" style="background:rgba(0,0,0,0.4);color:white;border:1px solid rgba(255,255,255,0.06);border-radius:6px;padding:4px 8px;width:100%;margin-top:4px;font-size:0.7rem;" />
+                        <div class="upload-group" style="margin-top:4px;">
+                            <input type="file" id="teamLogoFile_${team.id}" accept="image/*" onchange="handleTeamLogoUpdate(${team.id}, this)" />
+                            <label class="file-label" for="teamLogoFile_${team.id}" style="font-size:0.65rem;padding:4px 10px;">Cambiar logo</label>
+                            <img id="teamLogoPreview_${team.id}" src="${team.logo}" style="max-height:30px;max-width:30px;object-fit:contain;border-radius:4px;" />
+                        </div>
                     </td>
                     <td>
                         <button class="admin-btn admin-btn-sm" onclick="updateTeam(${team.id})"><i class="fas fa-save"></i></button>
@@ -2060,22 +2104,39 @@
 
     function addTeam() {
         const name = document.getElementById('newTeamName').value.trim() || 'Equipo';
-        const logo = document.getElementById('newTeamLogo').value.trim() || 'https://via.placeholder.com/30/cc0000/ffffff?text=H';
+        const logo = pendingTeamLogo || 'https://via.placeholder.com/30/cc0000/ffffff?text=H';
         data.teams.push({ id: data.nextTeamId++, name, logo, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, dg: 0, pts: 0 });
         document.getElementById('newTeamName').value = '';
-        document.getElementById('newTeamLogo').value = '';
+        pendingTeamLogo = null;
+        document.getElementById('teamLogoPreview').style.display = 'none';
         renderAll();
         syncToFirebase();
     }
 
+    let pendingTeamLogoUpdate = null;
+    function handleTeamLogoUpdate(id, input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const team = data.teams.find(t => t.id === id);
+            if (team) {
+                team.logo = e.target.result;
+                const preview = document.getElementById(`teamLogoPreview_${id}`);
+                if (preview) preview.src = e.target.result;
+                renderAll();
+                syncToFirebase();
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
     function updateTeam(id) {
         const nameInput = document.getElementById(`teamName_${id}`);
-        const logoInput = document.getElementById(`teamLogo_${id}`);
-        if (!nameInput || !logoInput) return;
+        if (!nameInput) return;
         const team = data.teams.find(t => t.id === id);
         if (team) {
             team.name = nameInput.value.trim() || team.name;
-            team.logo = logoInput.value.trim() || team.logo;
         }
         renderAll();
         syncToFirebase();
@@ -2213,14 +2274,17 @@
     }
 
     function addSponsor() {
-        const image = document.getElementById('sponsorInput').value.trim();
+        const image = pendingSponsorImage || document.getElementById('sponsorInput')?.value.trim();
         const link = document.getElementById('sponsorLinkInput').value.trim() || '#';
         if (image) {
             data.sponsors.push({ image, link });
-            document.getElementById('sponsorInput').value = '';
             document.getElementById('sponsorLinkInput').value = '';
+            pendingSponsorImage = null;
+            document.getElementById('sponsorPreview').style.display = 'none';
             renderAll();
             syncToFirebase();
+        } else {
+            alert('Por favor, selecciona una imagen para el patrocinador.');
         }
     }
 
@@ -2399,14 +2463,12 @@
             renderAdminInfo();
             populateSelects();
             
-            // Cargar datos en el panel
             document.getElementById('mvpNameInput').value = data.mvp.name || '';
             if (data.mvp.photo) {
                 document.getElementById('mvpPhotoPreview').src = data.mvp.photo;
                 document.getElementById('mvpPhotoPreview').style.display = 'block';
             }
             
-            // Scorer 1
             document.getElementById('scorer1Name').value = data.topScorers[0]?.name || '';
             document.getElementById('scorer1Goals').value = data.topScorers[0]?.goals || '';
             if (data.topScorers[0]?.photo) {
@@ -2414,7 +2476,6 @@
                 document.getElementById('scorer1PhotoPreview').style.display = 'block';
             }
             
-            // Scorer 2
             document.getElementById('scorer2Name').value = data.topScorers[1]?.name || '';
             document.getElementById('scorer2Goals').value = data.topScorers[1]?.goals || '';
             if (data.topScorers[1]?.photo) {
@@ -2422,7 +2483,6 @@
                 document.getElementById('scorer2PhotoPreview').style.display = 'block';
             }
             
-            // Scorer 3
             document.getElementById('scorer3Name').value = data.topScorers[2]?.name || '';
             document.getElementById('scorer3Goals').value = data.topScorers[2]?.goals || '';
             if (data.topScorers[2]?.photo) {
@@ -2485,6 +2545,7 @@
     window.addTeam = addTeam;
     window.updateTeam = updateTeam;
     window.deleteTeam = deleteTeam;
+    window.handleTeamLogoUpdate = handleTeamLogoUpdate;
     window.addJornada = addJornada;
     window.updateJornada = updateJornada;
     window.deleteJornada = deleteJornada;
@@ -2518,6 +2579,7 @@
     console.log('📐 Formatos: Videos e imágenes en 1920x1080 (16:9)');
     console.log('🏆 3 Máximos Goleadores sin medallas');
     console.log('🔗 Patrocinadores con enlaces a redes sociales');
+    console.log('📤 Sube logos de equipos y patrocinadores directamente sin URL');
 </script>
 
 </body>
